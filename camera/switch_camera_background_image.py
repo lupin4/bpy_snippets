@@ -1,6 +1,5 @@
-import os
 import re
-
+import pathlib
 import bpy
 
 
@@ -10,16 +9,15 @@ frame_string = f'{frame_current:04}'
 cbi = bpy.context.scene.camera.data.background_images[0]
 image = cbi.image
 
-filename = os.path.basename(image.filepath)
-filedir = os.path.dirname(image.filepath)
+filepath = pathlib.Path(image.filepath)
 
-
-match = re.match('(.*_)(\d+)(.png)', filename)
+match = re.match('(.*_)(\d+)(.png)', filepath.name)
 filename_components = list(match.groups())
-
 filename_components[-2] = frame_string
 filename_new = ''.join(filename_components)
-filepath_new = os.path.join(filedir, filename_new)
 
-if os.path.exists(filepath_new):
-    cbi.image.filepath = filepath_new
+filepath_new = filepath.parent.joinpath(filename_new)
+
+
+if filepath_new.exists():
+    image.filepath = str(filepath_new)
